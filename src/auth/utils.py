@@ -8,11 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from config.db import get_db
+from config.general import SECRET_KEY
 from src.auth.models import User
 from src.auth.repo import UserRepository
 from src.auth.schemas import TokenData, RoleEnum, UserResponse
 
-SECRET_KEY = "c939b00482f340be70f46ce7c34e8bd801b1abddab94a4bf613c455bae2ee5a3"  # You should store this in .env
+  # You should store this in .env
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7

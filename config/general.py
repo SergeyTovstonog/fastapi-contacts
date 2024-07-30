@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")
+
 MAIL_USERNAME = os.getenv("MAIL_USERNAME", "test")
 MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "test")
 MAIL_FROM=os.getenv("MAIL_FROM", "admin@23web.com")

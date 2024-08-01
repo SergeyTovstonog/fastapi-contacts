@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     database_url: str
-    secret_key: str = "secret_key"
+    secret_key: str = "secret_key_one"
     mail_username: str = "test"
     mail_password: str = "test"
     mail_from: str = "admin@23web.com"
@@ -19,3 +19,4 @@ class Settings(BaseSettings):
         extra = "allow"
 
 settings = Settings()
+

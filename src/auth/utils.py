@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from config.db import get_db
-from config.general import SECRET_KEY
+from config.general import settings
+
 from src.auth.models import User
 from src.auth.repo import UserRepository
 from src.auth.schemas import TokenData, RoleEnum, UserResponse
@@ -23,12 +24,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 def create_verification_token(email: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(hours=VERIFICATION_TOKEN_EXPIRE_HOURS)
     to_encode = {"exp": expire, "sub": email}
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
     return encoded_jwt
 
 def decode_verification_token(token: str) -> str | None:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
             return None
@@ -37,13 +38,13 @@ def decode_verification_token(token: str) -> str | None:
         return None
 
 access_security = JwtAccessBearerCookie(
-    secret_key=SECRET_KEY,
+    secret_key=settings.secret_key,
     auto_error=False,
     access_expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)  # change access token validation timedelta
 )
 # Read refresh token from bearer header only
 refresh_security = JwtRefreshBearer(
-    secret_key=SECRET_KEY,
+    secret_key=settings.secret_key,
     auto_error=True,  # automatically raise HTTPException: HTTP_401_UNAUTHORIZED
     access_expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 )

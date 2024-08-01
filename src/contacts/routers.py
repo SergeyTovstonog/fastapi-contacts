@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.cache import invalidate_contacts_cache
 from config.db import get_db
 from src.auth.models import User
 from src.auth.schemas import RoleEnum
 from src.auth.utils import get_current_user, RoleChecker
 from src.contacts.repo import ContactsRepository
 from src.contacts.schemas import ContactsCreate, ContactsResponse
+from fastapi_cache.decorator import cache
 
 router = APIRouter()
 
@@ -19,6 +21,7 @@ async def ping():
 @router.post("/", response_model=ContactsResponse, dependencies=[Depends(RoleChecker([RoleEnum.ADMIN]))])
 async def create_contacts(contact: ContactsCreate, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     repo = ContactsRepository(db)
+    await invalidate_contacts_cache()
     return await repo.create_contacts(contact, current_user.id)
 
 
@@ -37,6 +40,7 @@ async def get_contacts_all(
     return await repo.get_contacts_all(limit, offset)
 
 @router.get("/", response_model=list[ContactsResponse], dependencies=[Depends(RoleChecker([RoleEnum.USER, RoleEnum.ADMIN]))])
+@cache(expire=600, namespace="get_contacts")
 async def get_contacts(
     limit: int = 10, offset: int = 0, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):

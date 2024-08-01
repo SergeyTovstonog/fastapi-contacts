@@ -1,0 +1,16 @@
+name: oyster-app
+region: nyc3
+services:
+  - name: sergeytovstonog-fastapi-contacts
+    image:
+      registry_type: DOCKER_HUB
+      registry: sergeytovstonog
+      repository: fastapi-contacts
+      digest: ${SAMPLE_DIGEST}
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: "${DATABASE_URL}"
+      - key: SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: "${SECRET_KEY}"

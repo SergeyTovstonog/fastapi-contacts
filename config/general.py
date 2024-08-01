@@ -1,13 +1,21 @@
 import os
 
 from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
-load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")
+class Settings(BaseSettings):
+    database_url: str
+    secret_key: str = "secret_key"
+    mail_username: str = "test"
+    mail_password: str = "test"
+    mail_from: str = "admin@23web.com"
+    mail_port: int = 1025
+    mail_server: str = "localhost"
+    redis_url: str  # Add Redis URL
 
-MAIL_USERNAME = os.getenv("MAIL_USERNAME", "test")
-MAIL_PASSWORD=os.getenv("MAIL_PASSWORD", "test")
-MAIL_FROM=os.getenv("MAIL_FROM", "admin@23web.com")
-MAIL_PORT=os.getenv("MAIL_PORT", 1025)
-MAIL_SERVER=os.getenv("MAIL_SERVER", "localhost")
+    class Config:
+        env_file = ".env"
+        extra = "allow"
+
+settings = Settings()

@@ -1,7 +1,7 @@
 ingress:
   rules:
   - component:
-      name: sergeytovstonog-fastapi-contacts
+      name: fastapi-contacts
     match:
       path:
         prefix: /

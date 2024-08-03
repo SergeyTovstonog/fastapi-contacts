@@ -95,7 +95,7 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate
           pip install --upgrade pip
-          pip install sqlalchemy alembic asyncpg pydantic pydantic-settings
+          pip install sqlalchemy alembic asyncpg pydantic pydantic-settings pydantic[email]
       - name: Run Alembic migrations for production DB
         run: |
           source .venv/bin/activate

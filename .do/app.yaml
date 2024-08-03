@@ -5,7 +5,7 @@ ingress:
     match:
       path:
         prefix: /
-name: oyster-app
+name: new-contacts-app
 region: nyc
 services:
   - envs:
@@ -23,4 +23,4 @@ services:
       repository: fastapi-contacts
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-0.5gb
-    name: sergeytovstonog-fastapi-contacts
+    name: fastapi-contacts

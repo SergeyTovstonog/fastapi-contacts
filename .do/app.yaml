@@ -1,26 +1,16 @@
-ingress:
-  rules:
-  - component:
-      name: sergeytovstonog-fastapi-contacts
-    match:
-      path:
-        prefix: /
 name: oyster-app
-region: nyc
+region: nyc3
 services:
-  envs:
-    - key: DATABASE_URL
-      scope: RUN_AND_BUILD_TIME
-      value: "${DATABASE_URL}"
-    - key: SECRET_KEY
-      scope: RUN_AND_BUILD_TIME
-      value: "${SECRET_KEY}"
-  http_port: 80
-  image:
-    digest: ${SAMPLE_DIGEST}
-    registry: sergeytovstonog
-    registry_type: DOCKER_HUB
-    repository: fastapi-contacts
-  instance_count: 1
-  instance_size_slug: apps-s-1vcpu-0.5gb
-  name: sergeytovstonog-fastapi-contacts
+  - name: sergeytovstonog-fastapi-contacts
+    image:
+      registry_type: DOCKER_HUB
+      registry: sergeytovstonog
+      repository: fastapi-contacts
+      digest: ${SAMPLE_DIGEST}
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: "${DATABASE_URL}"
+      - key: SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: "${SECRET_KEY}"

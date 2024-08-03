@@ -63,7 +63,7 @@ jobs:
         pytest -v
   build-push-deploy-image:
     runs-on: ubuntu-latest
-#    needs: test
+    needs: test
     permissions:
       contents: read
       packages: write
@@ -95,7 +95,7 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate
           pip install --upgrade pip
-          pip install sqlalchemy alembic asyncpg
+          pip install sqlalchemy alembic asyncpg pydantic-settings
       - name: Run Alembic migrations for production DB
         run: |
           source .venv/bin/activate

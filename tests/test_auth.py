@@ -10,7 +10,7 @@ from src.auth.email_utils import send_verification
 
 
 @pytest.mark.asyncio
-async def test_user_register(override_get_db, user_role, faker, mocker, monkeypatch):
+async def test_user_register(override_get_db, user_role, faker, monkeypatch):
 
     with patch.object(BackgroundTasks, "add_task"):
 

@@ -22,19 +22,19 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
-#  web:
-#    build: .
-##    volumes:
-##      - .:/app
-#    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-#    ports:
-#      - 8000:8000
-#    environment:
-#      - POSTGRES_HOST=db
-#    env_file:
-#      - .env
-#    depends_on:
-#      - db
+  web:
+    build: .
+#    volumes:
+#      - .:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - 8000:8000
+    environment:
+      - POSTGRES_HOST=db
+    env_file:
+      - .env
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

@@ -1,7 +1,9 @@
 import asyncio
+from asyncio import tasks
 
 import pytest
 import pytest_asyncio
+from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -88,6 +90,7 @@ def override_get_db(db_session):
             yield session
 
     app.dependency_overrides[get_db] = _get_db
+
     yield
     app.dependency_overrides.clear()
 

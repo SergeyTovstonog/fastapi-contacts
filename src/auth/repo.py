@@ -1,9 +1,10 @@
 from functools import lru_cache
 
-from src.auth.models import User, Role
-from src.auth.schemas import UserCreate, RoleEnum
-from src.auth.pass_utils import get_password_hash
 from sqlalchemy import select
+
+from src.auth.models import Role, User
+from src.auth.pass_utils import get_password_hash
+from src.auth.schemas import RoleEnum, UserCreate
 
 
 class UserRepository:
@@ -13,11 +14,13 @@ class UserRepository:
     async def create_user(self, user_create: UserCreate):
         hashed_password = get_password_hash(user_create.password)
         user_role = await RoleRepository(self.session).get_role_by_name(RoleEnum.USER)
-        new_user = User(username=user_create.username,
-                        hashed_password=hashed_password,
-                        email=user_create.email,
-                        role_id=user_role.id,
-                        is_active=False)
+        new_user = User(
+            username=user_create.username,
+            hashed_password=hashed_password,
+            email=user_create.email,
+            role_id=user_role.id,
+            is_active=False,
+        )
         self.session.add(new_user)
         await self.session.commit()
         await self.session.refresh(new_user)  # To get the ID from the database

@@ -2,13 +2,13 @@ import asyncio
 
 import pytest
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from config.db import Base, get_db
 from config.general import settings
 from main import app
-from src.auth.models import User, Role
+from src.auth.models import Role, User
 from src.auth.pass_utils import get_password_hash
 from src.auth.schemas import RoleEnum
 from src.auth.utils import create_access_token, create_refresh_token
@@ -19,12 +19,14 @@ SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
 )
 
+
 @pytest.fixture(scope="session")
 def event_loop():
     """Create an instance of the event loop to be used in tests."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
+
 
 @pytest_asyncio.fixture(scope="function")
 async def setup_db():
@@ -38,14 +40,17 @@ async def setup_db():
         # Drop all tables
         await conn.run_sync(Base.metadata.drop_all)
 
+
 @pytest_asyncio.fixture(scope="function")
 async def db_session(setup_db):
     async with SessionLocal() as session:
         yield session
 
+
 @pytest_asyncio.fixture(scope="function")
 async def user_password(faker):
     return faker.password()
+
 
 @pytest_asyncio.fixture(scope="function")
 async def user_role(db_session):
@@ -75,25 +80,26 @@ async def test_user(db_session: AsyncSession, faker, user_password, user_role):
     await db_session.refresh(new_user)  # To get the ID from the database
     return new_user
 
+
 @pytest_asyncio.fixture(scope="function")
 def override_get_db(db_session):
     async def _get_db():
         async with db_session as session:
             yield session
+
     app.dependency_overrides[get_db] = _get_db
     yield
     app.dependency_overrides.clear()
 
+
 @pytest_asyncio.fixture(scope="function")
 async def auth_headers(test_user):
-    access_token = create_access_token(
-        data={"sub": test_user.username})
-    refresh_token = create_refresh_token(
-        data={"sub": test_user.username})
+    access_token = create_access_token(data={"sub": test_user.username})
+    refresh_token = create_refresh_token(data={"sub": test_user.username})
     headers = {
         "Authorization": f"Bearer {access_token}",
         "X-Refresh-Token": refresh_token,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     return headers
 
@@ -107,7 +113,7 @@ async def test_user_contact(db_session, test_user: User, faker) -> Contact:
         phone_number=faker.phone_number(),
         owner_id=test_user.id,
         birthday=faker.date_of_birth(),
-        additional_info=faker.text()  # Normally optional field with some content. In real-world application, it could be None or empty string.  # noqa: E501
+        additional_info=faker.text(),  # Normally optional field with some content. In real-world application, it could be None or empty string.  # noqa: E501
     )
     db_session.add(contact)
     await db_session.commit()

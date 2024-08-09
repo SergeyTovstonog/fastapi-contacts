@@ -1,17 +1,16 @@
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
-from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from config.db import get_db
+from config.general import settings
 from src.auth.models import User
 from src.auth.repo import UserRepository
-from config.general import settings
-from src.auth.schemas import TokenData, RoleEnum
+from src.auth.schemas import RoleEnum, TokenData
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -20,11 +19,15 @@ VERIFICATION_TOKEN_EXPIRE_HOURS = 24
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
+
 def create_verification_token(email: str) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(hours=VERIFICATION_TOKEN_EXPIRE_HOURS)
+    expire = datetime.now(timezone.utc) + timedelta(
+        hours=VERIFICATION_TOKEN_EXPIRE_HOURS
+    )
     to_encode = {"exp": expire, "sub": email}
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 def decode_verification_token(token: str) -> str | None:
     try:
@@ -36,12 +39,15 @@ def decode_verification_token(token: str) -> str | None:
     except JWTError:
         return None
 
+
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
     return encoded_jwt
@@ -69,7 +75,9 @@ def decode_access_token(token: str) -> TokenData | None:
         return None
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -84,19 +92,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         raise credentials_exception
     return user
 
+
 class RoleChecker:
     def __init__(self, allowed_roles: list[RoleEnum]):
         self.allowed_roles = allowed_roles
 
-    async def __call__(self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
+    async def __call__(
+        self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+    ) -> User:
         user = await get_current_user(token, db)
 
         if user.role.name not in [role.value for role in self.allowed_roles]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have permission to perform this action"
+                detail="You do not have permission to perform this action",
             )
         return user
-
-
-

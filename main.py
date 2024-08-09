@@ -24,3 +24,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(router_contacts, prefix="/contacts", tags=["contacts"])
 app.include_router(router_auth, prefix="/auth", tags=["auth"])
 
+@app.get('/ping')
+async def ping():
+    return {'message': 'pong'}
+

@@ -47,7 +47,7 @@ jobs:
         source .venv/bin/activate
         pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-asyncio
+        pip install pytest pytest-asyncio pytest-faker
     - name: Wait for Postgres
       run: |
         while ! pg_isready -h localhost -p 5432 -U test_user -d test_db; do
